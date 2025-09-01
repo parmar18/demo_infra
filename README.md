@@ -9,7 +9,7 @@ Containerization (Docker)
 
 Global load balancing
 
-🏗️ Architecture
+Architecture
 User --> Global HTTP Load Balancer --> Backend Service --> MIG --> VM (Debian + Docker) --> Flask App
 
 
@@ -23,7 +23,7 @@ Instance Template: Installs Docker, pulls the image, runs the Flask container.
 
 Load Balancer: Global entrypoint, health checks /health, routes traffic.
 
-🌐 App Endpoints
+App Endpoints
 
 /health → returns OK (for LB checks)
 
@@ -42,7 +42,7 @@ Response:
   "docker": "Platform for containerizing applications with all dependencies."
 }
 
-🚀 Deployment Technique
+Deployment Technique
 1. Build and push image
 docker buildx build --platform linux/amd64 \
   -t us-central1-docker.pkg.dev/<PROJECT>/<REPO>/search-app:v3 \
@@ -55,7 +55,7 @@ terraform apply -auto-approve
 3. Get Load Balancer IP
 terraform output -raw lb_ip
 
-✅ Best Practices Applied
+Best Practices Applied
 
 Modular Terraform (vpc, firewall, compute, loadbalancer)
 
@@ -67,7 +67,7 @@ Startup script logs to /var/log/search-app.log
 
 .gitignore excludes secrets and state files
 
-📚 Lessons Learned
+Lessons Learned
 
 Always build multi-arch images when developing on ARM Macs
 
