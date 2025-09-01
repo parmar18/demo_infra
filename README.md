@@ -1,9 +1,16 @@
 Infra Demo: Flask App on GCP
 
-This project deploys a containerized Flask app to Google Cloud Platform (GCP) using Terraform. It demonstrates Infrastructure-as-Code, containerization, and global load balancing.
+This project deploys a containerized Flask app to Google Cloud Platform (GCP) using Terraform.
+It demonstrates:
 
-Architecture
- User --> Global HTTP Load Balancer --> Backend Service --> MIG --> VM (Debian + Docker) --> Flask App
+Infrastructure-as-Code (IaC)
+
+Containerization (Docker)
+
+Global load balancing
+
+🏗️ Architecture
+User --> Global HTTP Load Balancer --> Backend Service --> MIG --> VM (Debian + Docker) --> Flask App
 
 
 VPC + Firewall: Isolated network, allows HTTP/HTTPS/health/SSH.
@@ -16,51 +23,51 @@ Instance Template: Installs Docker, pulls the image, runs the Flask container.
 
 Load Balancer: Global entrypoint, health checks /health, routes traffic.
 
-App Endpoints
+🌐 App Endpoints
 
 /health → returns OK (for LB checks)
 
 / → returns welcome message
 
-/search?q=<term> → returns definition (from a small knowledge base)
+/search?q= → returns definition (from a small knowledge base)
 
 Example:
 
 curl http://<LB_IP>/search?q=docker
-# {"docker": "Platform for containerizing applications with all dependencies."}
 
-Deployment Technique
 
-Build and push image:
+Response:
 
+{
+  "docker": "Platform for containerizing applications with all dependencies."
+}
+
+🚀 Deployment Technique
+1. Build and push image
 docker buildx build --platform linux/amd64 \
   -t us-central1-docker.pkg.dev/<PROJECT>/<REPO>/search-app:v3 \
   --push .
 
-
-Provision infra with Terraform:
-
+2. Provision infra with Terraform
 terraform init
 terraform apply -auto-approve
 
-
-Get Load Balancer IP:
-
+3. Get Load Balancer IP
 terraform output -raw lb_ip
 
-Best Practices Applied
+✅ Best Practices Applied
 
 Modular Terraform (vpc, firewall, compute, loadbalancer)
 
 MIG update_policy for rolling updates
 
-Health check aligned with /health
+Health check aligned with /health endpoint
 
 Startup script logs to /var/log/search-app.log
 
 .gitignore excludes secrets and state files
 
-Lessons Learned
+📚 Lessons Learned
 
 Always build multi-arch images when developing on ARM Macs
 
