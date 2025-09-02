@@ -83,18 +83,18 @@ Best Practices To-Be Applied
 Issues I ran into
 --------------------------------------------------
 
-- Docker Image Architecture Mismatch
+- Docker Image Architecture Mismatch:
   Built the image on Mac (ARM) while GCP VMs required AMD64. Fixed by rebuilding with --platform linux/amd64.
 
-- Startup Script Errors in main.tf
+- Startup Script Errors in main.tf:
   Initial VM startup script failed to correctly pull and run the container. Needed retries and better logging to debug.
 
-- Load Balancer Health Check Failures
+- Load Balancer Health Check Failures:
   Health check kept failing until the containerized app exposed the correct /health endpoint on the expected port (8080).
 
-- Image Pull Issues
+- Image Pull Issues:
   Even when health checks were configured, the container sometimes wasn’t pulled/run properly from Artifact Registry. Ensured correct image tags and permissions.
 
-- SSL Certificate & DNS Integration
+- SSL Certificate & DNS Integration:
   Managed SSL certificate initially showed FAILED_NOT_VISIBLE due to DNS pointing at the wrong/ephemeral IP. Fixed by reserving a static global IP and updating DNS records.
 
