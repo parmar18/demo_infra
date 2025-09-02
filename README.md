@@ -36,27 +36,6 @@ curl http://<LB_IP>/search?q=docker
 Response:
 {"docker": "Platform for containerizing applications with all dependencies."}
 
-
---------------------------------------------------
-Deployment Technique
---------------------------------------------------
-
-1. Build and push image:
-
-docker buildx build --platform linux/amd64 \
-  -t us-central1-docker.pkg.dev/<PROJECT>/<REPO>/search-app:v3 \
-  --push .
-
-2. Provision infra with Terraform:
-
-terraform init
-terraform apply -auto-approve
-
-3. Get Load Balancer IP:
-
-terraform output -raw lb_ip
-
-
 --------------------------------------------------
 Best Practices Applied
 --------------------------------------------------
