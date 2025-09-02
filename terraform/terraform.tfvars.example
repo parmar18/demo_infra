@@ -1,0 +1,4 @@
+project_id   = "your-project-id"
+region       = "us-central1"
+zone         = "us-central1-a"
+docker_image = "us-central1-docker.pkg.dev/YOUR_PROJECT/YOUR_REPO/YOUR_IMAGE:latest"
