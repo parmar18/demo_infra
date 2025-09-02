@@ -1,13 +1,13 @@
-# Global, anycast IP for the LB
+# Global IP stays the same
 resource "google_compute_global_address" "lb_ip" {
-  name = "search-app-ip-http"
+  name = "search-app-ip"
 }
 
-# Health check (LB→VM on app port)
+# Health check
 resource "google_compute_health_check" "app_check" {
-  name = "search-app-hc-http"
+  name = "search-app-hc"
   http_health_check {
-    port = 8080
+    port         = 8080
     request_path = "/health"
   }
   check_interval_sec  = 10
@@ -16,9 +16,9 @@ resource "google_compute_health_check" "app_check" {
   unhealthy_threshold = 2
 }
 
-# Backend service points at your MIG
+# Backend service
 resource "google_compute_backend_service" "backend" {
-  name          = "search-backend-http"
+  name          = "search-backend"
   protocol      = "HTTP"
   port_name     = "http"
   timeout_sec   = 30
@@ -29,22 +29,46 @@ resource "google_compute_backend_service" "backend" {
   }
 }
 
-# URL map (all paths → backend)
-resource "google_compute_url_map" "urlmap" {
-  name            = "search-urlmap-http"
+# NEW SSL cert
+resource "google_compute_managed_ssl_certificate" "cert_for" {
+  name = "search-app-cert-for"
+
+  managed {
+    domains = ["hackforindia.com", "www.hackforindia.com"]
+  }
+}
+
+# NEW URL map
+resource "google_compute_url_map" "urlmap_new" {
+  name            = "search-urlmap-new"
   default_service = google_compute_backend_service.backend.id
 }
 
-# HTTP proxy (no TLS)
-resource "google_compute_target_http_proxy" "http_proxy" {
-  name    = "search-http-proxy"
-  url_map = google_compute_url_map.urlmap.id
+# NEW HTTP proxy
+resource "google_compute_target_http_proxy" "http_proxy_new" {
+  name    = "search-http-proxy-new"
+  url_map = google_compute_url_map.urlmap_new.id
 }
 
-# Entry point: port 80 on the global IP
+# NEW HTTPS proxy
+resource "google_compute_target_https_proxy" "https_proxy_new" {
+  name             = "search-https-proxy-new"
+  ssl_certificates = [google_compute_managed_ssl_certificate.cert_for.id]
+  url_map          = google_compute_url_map.urlmap_new.id
+}
+
+# Forwarding rule for HTTP (update to new proxy)
 resource "google_compute_global_forwarding_rule" "http_rule" {
   name       = "search-http-rule"
   ip_address = google_compute_global_address.lb_ip.address
   port_range = "80"
-  target     = google_compute_target_http_proxy.http_proxy.id
+  target     = google_compute_target_http_proxy.http_proxy_new.id
+}
+
+# Forwarding rule for HTTPS (update to new proxy)
+resource "google_compute_global_forwarding_rule" "https_rule" {
+  name       = "search-https-rule"
+  ip_address = google_compute_global_address.lb_ip.address
+  port_range = "443"
+  target     = google_compute_target_https_proxy.https_proxy_new.id
 }

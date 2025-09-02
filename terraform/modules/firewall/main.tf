@@ -36,6 +36,6 @@ resource "google_compute_firewall" "allow-lb-health-check" {
   source_ranges = [
     "35.191.0.0/16",
     "130.211.0.0/22"
-  ] # Official GCP LB/HC IPs
-  target_tags = ["search-app"] # must match your MIG template tags
+  ]
+  target_tags = ["search-app"]
 }
