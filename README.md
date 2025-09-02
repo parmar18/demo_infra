@@ -98,3 +98,11 @@ Issues I ran into
 - SSL Certificate & DNS Integration:
   Managed SSL certificate initially showed FAILED_NOT_VISIBLE due to DNS pointing at the wrong/ephemeral IP. Fixed by reserving a static global IP and updating DNS records.
 
+
+--------------------------------------------------
+Kubernetes Founding Stone
+--------------------------------------------------
+
+- Current Setup: MIG + startup script → pull image → run container.
+- With Kubernetes: GKE manages pods → pulls container → auto restarts if crash.
+- Benefits: Only have to define Ingress + ManagedCertificate instead of forwarding rule, proxies, URL map, SSL cert
