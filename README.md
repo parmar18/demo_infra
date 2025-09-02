@@ -1,6 +1,6 @@
-==================================================
+--------------------------------------------------
 Infra Demo: Flask App on GCP
-==================================================
+--------------------------------------------------
 
 This project deploys a containerized Flask app to Google Cloud Platform (GCP) 
 using Terraform. It demonstrates Infrastructure-as-Code, containerization, 
@@ -64,15 +64,37 @@ Best Practices Applied
 - Modular Terraform (vpc, firewall, compute, loadbalancer)
 - MIG update_policy for rolling updates
 - Health check aligned with /health endpoint
+- Enabled HTTPS with domain + managed certs
 - Startup script logs to /var/log/search-app.log
 - .gitignore excludes secrets and state files
 
+--------------------------------------------------
+Best Practices To-Be Applied
+--------------------------------------------------
+
+- Setting up of Development and Staging Enviornments
+- Improve scaling & resiliency depending on the requirements
+- Add observability & alerts
+- Store secrets in GCP Secret Manager instead of code
+- Add automated tests for startup scripts and health checks
+
 
 --------------------------------------------------
-Lessons Learned
+Issues I ran into
 --------------------------------------------------
 
-- Always build multi-arch images when developing on ARM Macs
-- Match LB health checks with app endpoints
-- Use update_policy in MIGs for smooth rollouts
-- Log startup scripts for easier debugging
+- Docker Image Architecture Mismatch
+  Built the image on Mac (ARM) while GCP VMs required AMD64. Fixed by rebuilding with --platform linux/amd64.
+
+- Startup Script Errors in main.tf
+  Initial VM startup script failed to correctly pull and run the container. Needed retries and better logging to debug.
+
+- Load Balancer Health Check Failures
+  Health check kept failing until the containerized app exposed the correct /health endpoint on the expected port (8080).
+
+- Image Pull Issues
+  Even when health checks were configured, the container sometimes wasn’t pulled/run properly from Artifact Registry. Ensured correct image tags and permissions.
+
+- SSL Certificate & DNS Integration
+  Managed SSL certificate initially showed FAILED_NOT_VISIBLE due to DNS pointing at the wrong/ephemeral IP. Fixed by reserving a static global IP and updating DNS records.
+
